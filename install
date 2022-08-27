@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+VERSION=v0.8.2
+
+help() {
+  echo "Usage:"
+  echo "  zmicro package install dust <args...>"
+  echo ""
+}
+
+install() {
+  local arch="x86_64"
+  local typ="unknown"
+  local os="linux-gnu"
+  local bin_path=/usr/bin
+
+  if [ "$(os::arch)" = "arm64" ]; then
+    arch="aarch64"
+  fi
+
+  if [ "$(os::is_macos)" = "true" ]; then
+    arch="x86_64" # mac no aarch64 found
+    typ="apple"
+    os="darwin"
+    bin_path=/usr/local/bin
+  fi
+
+  local tmp_file=/tmp/dust.tar.gz
+  local url="https://github.com/bootandy/dust/releases/download/${VERSION}/dust-${VERSION}-${arch}-${typ}-${os}.tar.gz"
+  curl -fSL $url -o $tmp_file
+  cd /tmp
+  tar -zxvf $tmp_file >>/dev/null 2>&1
+  sudo mv dust-${VERSION}-${arch}-${typ}-${os}/dust $bin_path
+  rm -rf $tmp_file
+  rm -rf dust-${VERSION}-${arch}-${typ}-${os}
+}
+
+core() {
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    help
+    exit 0
+  fi
+
+  install
+  log::success "install dust success."
+}
+
+run() {
+  core $@
+}
+
+run $@

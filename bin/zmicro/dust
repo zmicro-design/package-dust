@@ -1,0 +1,17 @@
+#!/bin/bash
+
+help() {
+  echo "Usage:"
+  echo "  zmicro dust <args ...>"
+  echo ""
+}
+
+core() {
+  dust "$@"
+}
+
+run() {
+  core "$@"
+}
+
+run "$@"
